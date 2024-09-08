@@ -1,37 +1,51 @@
-
-import React, { useState } from 'react';
-import { doc } from 'firebase/firestore'; 
+import Swal from 'sweetalert2'
+import React, {  useState } from 'react';
+import { doc, setDoc } from 'firebase/firestore'; 
 import { db,auth } from '../database/firebase.config';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+
+
 const Signup = () => {
-    const [fullName, setFullName] = useState('a');
-    const [email, setEmail] = useState('s');
-    const [password, setPassword] = useState('v');
- 
-
-    const handleSubmit = (e) => {
+    const navigate = useNavigate()
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+   
+    const handleSignup = (e) => {
         e.preventDefault();
-        // Handle login logic here
-        console.log('Full Name:', fullName, 'Email:', email, 'Password:', password);
-      
-        createUserWithEmailAndPassword(auth, email, password)
-  .then((response) => {
-    // Signed up 
-    const user = response.user;
-    alert(response.user)
-  })
-  .catch((error) => {
-    // const errorCode = error.code;
-    const errorMessage =  error.message;
-    alert(error.message)
-  });
+        // Handle signup logic here
+        // console.log('Full Name:', fullName, 'Email:', email, 'Password:', password);
     };
+    createUserWithEmailAndPassword(auth, email, password)
+    .then(async (response) => {
+      const uid = response.user;
+      const userData= {fullName,email,password,uid}
+     await  setDoc(doc(db, "users",  uid), userData)
+      Swal.fire({
+        icon: "success",
+        title: "Signup Completed !",
+        text: "Do you want to continue",
+      });
+        navigate('/home')
 
+      // ...
+    })
+    .catch((error) => {   
+        console.error("Error during signup:", error);
+           Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text:error.message,
+    })
+    
+    });
+  
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="w-full max-w-md bg-white p-8 shadow-lg rounded-lg">
                 <h2 className="text-2xl font-bold text-center mb-6">Signup</h2>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSignup}>
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
                        Full Name
@@ -76,7 +90,7 @@ const Signup = () => {
                     </div>
                     <div className="flex items-center justify-between">
                         <button
-                        onClick={handleSubmit}
+                        onClick={handleSignup}
                             type="submit"
                             className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                         >
