@@ -25,7 +25,7 @@ const Signup = () => {
     createUserWithEmailAndPassword(auth, email, password)
     .then(async (response) => {
       const uid = response.user.uid;
-      const userData= {fullName,email,password,uid}
+      const userData= {fullName,email,uid}
       localStorage.setItem("userId",uid)
      await  setDoc(doc(db, "users", uid), userData)
      setisLoading(false)

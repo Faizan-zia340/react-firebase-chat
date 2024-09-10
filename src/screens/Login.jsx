@@ -16,7 +16,7 @@ const Login = () => {
         // Handle login logic here
        console.log('Email:', email, 'Password:', password);
        signInWithEmailAndPassword(auth, email, password)
-    .then((response) => {
+    .then(async (response) => {
       const uid = response.user.uid;
           localStorage.setItem("userId",uid)
     
@@ -25,7 +25,7 @@ const Login = () => {
       Swal.fire({
         icon: "success",
         title: "Login Completed !",
-        text: "Do you want to continue",
+        
       });
         navigate('/home')
 
