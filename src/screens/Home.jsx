@@ -23,8 +23,8 @@ export default  function Home() {
   }
     return (
       <div>
-        <div className="bg-[skyblue] w-full  p-6 mb-12">
-          <h1 className="text-2xl font-bold text-blue-800">User List</h1>
+        <div className="bg-[#0f546f] w-full  p-6 mb-12">
+          <h1 className="text-2xl font-bold text-white">User List</h1>
         </div>
 {users.map(item=>(
   <div key={item.uid} onClick={()=>navigate('/Chat',{ state: item } ) } className="cursor-pointer w-11/12 shadow-md border bg-blue-50  border-black shadow-gray-300 rounded-lg flex justify-between mx-auto my-4 py-5 px-10">
