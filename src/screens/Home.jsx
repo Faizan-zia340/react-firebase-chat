@@ -14,6 +14,9 @@ export default  function Home() {
   }, [])
   
   const getUsers = async () => {
+    let uid =localStorage.getItem("userId" )
+      setUid(uid)
+       
     const list=[]
  const dbSnap=await  getDocs(collection(db,"users"))
  dbSnap.forEach(item=>{
@@ -28,7 +31,7 @@ export default  function Home() {
           <h1 className="text-2xl font-bold text-white">User List</h1>
         </div>
 {users.map(item=>(
-  <div key={item.uid} onClick={()=>navigate('/Chat',{ state: item } ) } className="cursor-pointer w-11/12 shadow-md border bg-blue-50  border-black shadow-gray-300 rounded-lg flex justify-between mx-auto my-4 py-5 px-10">
+  <div key={item.uid} onClick={()=>navigate('/Chat',{ state: {...item,myUid} } ) } className="cursor-pointer w-11/12 shadow-md border bg-blue-50  border-black shadow-gray-300 rounded-lg flex justify-between mx-auto my-4 py-5 px-10">
  <div className="flex item-center">
   <img src="https://www.pngitem.com/pimgs/m/22-223968_default-profile-picture-circle-hd-png-download.png"  className="w-16  mr-4  rounded-full border-2 border-gray-500" />
  <div>

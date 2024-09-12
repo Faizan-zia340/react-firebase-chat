@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, onSnapshot, where } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { auth } from '../database/firebase.config';
 import { db } from "../database/firebase.config";
@@ -10,29 +10,38 @@ export default function Home() {
   const { state } = useLocation();
   const [messages, setMessages] = useState(""); // Changed to an empty string for input field
   const [chatList, setChatList] = useState([]); // CamelCase for consistency
+  const [myUid, setMyUid] = useState(""); // Added state to store myUid
+
+  // Fetch myUid from local storage
+  useEffect(() => {
+    const uid = localStorage.getItem('userId');
+    setMyUid(uid); // Storing myUid in state
+  }, []);
 
   console.log("state", state);
 
   useEffect(() => {
-    getMessages(); // Fetching messages on component mount
-  }, []);
+    if (myUid && state.uid) { // Ensure both UIDs are available before querying
+      const q = query(
+        collection(db, "chat"), 
+        where(state.uid, "==", true), 
+        where(myUid, "==", true) // Used myUid from state
+      );
 
-  const getMessages = async () => {
-     localStorage.getItem('userId').then(myUid=>{
-    const q = query(collection(db, "chat"), where(state.uid, "==", true), where(myUid, "==", true));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-  const cities = [];
-  querySnapshot.forEach((doc) => {
-      cities.push(doc.data().name);
-  });
-  console.log("Current cities in CA: ", cities.join(", "));
-    });
-   });
-    };
+      const unsubscribe = onSnapshot(q, (docsnap) => {
+        const list = [];
+        docsnap.forEach((doc) => {
+          list.push(doc.data()); // Pushed the entire document data
+        });
+        setChatList(list); // Set the entire list as chatList
+      });
+
+      return () => unsubscribe(); // Cleanup subscription
+    }
+  }, [myUid, state.uid]); // Added dependencies to the useEffect
 
   const sendMessage = async () => {
-    try {
-      let myUid = await localStorage.getItem('userId');
+    if (messages.trim()) { // Ensure message is not empty
       await addDoc(collection(db, "chat"), {
         message: messages, // Saving the message as a string
         [myUid]: true,
@@ -40,8 +49,6 @@ export default function Home() {
         createdAt: Date.now() // Corrected 'date.now()' to 'Date.now()'
       });
       setMessages(""); // Resetting input field after sending
-    } catch (error) {
-      console.error("Error sending message: ", error);
     }
   };
 
@@ -64,9 +71,17 @@ export default function Home() {
       {/* Chat section */}
       <div className="bg-gray-100 h-[80vh] ">
         {/* Display chat messages here */}
-        {chatList.map((chat, index) => (
-          <div key={index}>
-            <p>{chat.message}</p>
+        {chatList.map((item, index) => (
+          <div 
+            key={index} // Use index if no unique ID is available, although using a unique ID is better
+            onClick={() => navigate('/Chat', { state: { ...item, myUid } })} 
+            className="cursor-pointer w-11/12 shadow-md border bg-blue-50 border-black shadow-gray-300 rounded-lg flex justify-between mx-auto my-4 py-5 px-10"
+          >
+            <div className="flex item-center">
+              <div>
+                <h1 className="uppercase font-semibold text-xl"> {item.message}</h1> {/* Accessed message field */}
+              </div>
+            </div>
           </div>
         ))}
       </div>
