@@ -5,6 +5,7 @@ import { db } from "../database/firebase.config"
 
 export default  function Home() {
  const [users, setUsers] = useState([]) 
+ const [myUid, setUid] = useState("") 
  const navigate=useNavigate()
  console.log("users",users)
   
@@ -19,7 +20,7 @@ export default  function Home() {
   list.push(item.data())
  })
  setUsers(list)
-
+ 
   }
     return (
       <div>
