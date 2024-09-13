@@ -33,7 +33,8 @@ export default function Home() {
         docsnap.forEach((doc) => {
           list.push(doc.data()); // Pushed the entire document data
         });
-        setChatList(list); // Set the entire list as chatList
+        const sortlist=list.sort((a,b)=>a.createdAt-b.createdAt) 
+        setChatList(sortlist); // Set the entire list as chatList
       });
 
       return () => unsubscribe(); // Cleanup subscription
@@ -44,7 +45,8 @@ export default function Home() {
     if (messages.trim()) { // Ensure message is not empty
       await addDoc(collection(db, "chat"), {
         message: messages, // Saving the message as a string
-        [myUid]: true,
+        senderUid : state.myUid, // Using myUid from state.myUid,
+        [state.myUid]: true,
         [state.uid]: true,
         createdAt: Date.now() // Corrected 'date.now()' to 'Date.now()'
       });
@@ -80,6 +82,7 @@ export default function Home() {
             <div className="flex item-center">
               <div>
                 <h1 className="uppercase font-semibold text-xl"> {item.message}</h1> {/* Accessed message field */}
+                 <h1 className="uppercase  text-xl"> {new Date(item.createdAt).toLocaleDateString()}</h1>
               </div>
             </div>
           </div>
