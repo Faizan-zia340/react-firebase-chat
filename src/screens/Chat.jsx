@@ -3,6 +3,7 @@ import { addDoc, collection, getDocs, query, onSnapshot, where } from "firebase/
 import { useEffect, useState } from "react";
 import { auth } from '../database/firebase.config';
 import { db } from "../database/firebase.config";
+import moment from 'moment';
 
 export default function Home() {
 
@@ -74,18 +75,21 @@ export default function Home() {
       <div className="bg-gray-100 h-[80vh] ">
         {/* Display chat messages here */}
         {chatList.map((item, index) => (
-          <div 
-            key={index} // Use index if no unique ID is available, although using a unique ID is better
-            onClick={() => navigate('/Chat', { state: { ...item, myUid } })} 
-            className="cursor-pointer w-11/12 shadow-md border bg-blue-50 border-black shadow-gray-300 rounded-lg flex justify-between mx-auto my-4 py-5 px-10"
-          >
-            <div className="flex item-center">
-              <div>
-                <h1 className="uppercase font-semibold text-xl"> {item.message}</h1> {/* Accessed message field */}
-                 <h1 className="uppercase  text-xl"> {new Date(item.createdAt).toLocaleDateString()}</h1>
-              </div>
-            </div>
-          </div>
+        <div 
+  key={index} 
+  onClick={() => navigate('/Chat', { state: { ...item, myUid } })} 
+  className= `cursor-pointer w-11/12 shadow-md border bg-blue-50 border-black shadow-gray-300 rounded-md mx-auto flex justify-between items-center my-4 py-5 px-10 ${item.senderUid==state.myUid ?'justify-end':justif-start} ` >
+
+  <div className="flex items-center justify-between w-full">
+    <div>
+      <h1 className="uppercase font-semibold text-xl">{item.message}</h1>
+    </div>
+    <div>
+      <h1 className="text-gray-400 text-sm text-right">{moment(item.createdAt).startOf('seconds').fromNow()}</h1>
+    </div>
+  </div>
+</div>
+
         ))}
       </div>
 
